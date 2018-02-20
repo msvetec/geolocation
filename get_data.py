@@ -5,7 +5,8 @@ import io
 
 
 
-jsonFile = {}
+
+jsonFile = []
 
 def GetData(_townName):
     
@@ -21,16 +22,19 @@ def GetData(_townName):
     
 
 def MakeJSON(_cityArea,_population,_elevation):
-   
-    jsonFile[townName] = {
-        'Velicina':_cityArea,
-        'Broj stanovika':_population,
-        'Nadmorska visina':_elevation }
-    return 
+   for i in range (0,unos):
+       jsonDict = {
+           'Ime':townName,
+           'Velicina':_cityArea/1000000,
+           'Broj_stanovika':_population,
+           'Nadmorska_visina':_elevation }
+       jsonFile.append(jsonDict)
+       return 
 
 def WriteJSONFile(jsonFile):
-    with io.open('test.json','w',encoding='utf-8') as f:
-        f.write(json.dumps(jsonFile, sort_keys = True, ensure_ascii=False))
+    with io.open('dataJSON.json','w',encoding='utf-8') as f:
+        f.write(json.dumps(jsonFile, sort_keys = False, ensure_ascii=False))
+    return
     
 
 unos = int(input("Unesite broj gradova: "))
@@ -43,3 +47,5 @@ for i in range(0,unos):
     
 
 WriteJSONFile(jsonFile)
+
+
