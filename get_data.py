@@ -13,6 +13,7 @@ jsonFile = []
 
 #dohvacanje podataka iz baze znanja DBpedia i vracanje informacija o gradu/drzavi/zupaniji koje se spremaju u jsonDict rijecnik
 def GetData(_townName):
+<<<<<<< HEAD
     provjera = 1
     provjera2 = 0
     
@@ -27,30 +28,26 @@ def GetData(_townName):
     else:
             town = data['http://dbpedia.org/resource/'+_townName]
             kriviUnos=0
+=======
+   
+    data = requests.get('http://dbpedia.org/data/'+_townName+'.json').json()
+    while True:
+        try:
+            town = data['http://dbpedia.org/resource/'+_townName]
+            
+            
+>>>>>>> parent of 7cdcb74... beta2
             while True:
                 try:
-                    cityArea = town['http://dbpedia.org/ontology/areaTotal'][0]['value']
-                    provjera = 0
+                    cityArea = town['http://dbpedia.org/ontology/area'][0]['value']
                     break
                 except:
+                    cityArea = town['http://dbpedia.org/ontology/areaTotal'][0]['value']
                     break
-            if provjera:
-                while True:
-                    try:
-                        cityArea = town['http://dbpedia.org/ontology/areaUrban'][0]['value']
-                        break
-                    except:
-                        provjera2=1
-                        break
-            if provjera2:
-                while True:
-                    try:
-                        cityArea = town['http://dbpedia.org/ontology/area'][0]['value']
-                        break
-                    except:
-                        print("Baza ne sadrzi podatke o povrsini grada!")
-                        cityArea=0
-                        break   
+                else:
+                    cityArea = town['http://dbpedia.org/ontology/areaUrban'][0]['value']
+                    break
+                    
             while True:
                 try:
                     population = town['http://dbpedia.org/ontology/populationTotal'][0]['value']
@@ -67,10 +64,13 @@ def GetData(_townName):
                     elevation = 0
                     break
             return cityArea,population,elevation
-            
+        except:
+            print("Grad ne postoji")
+            break
     
 #Kreiranje .json datoteke na temelju jsonDict rijecnika
 def MakeJSON(_cityArea,_population,_elevation):
+<<<<<<< HEAD
    jsonDict = {
        'Ime':townName,
        'Velicina':_cityArea/1000000,
@@ -79,6 +79,17 @@ def MakeJSON(_cityArea,_population,_elevation):
    jsonFile.append(jsonDict)
    return 
 #kreiranje .json da datoteke u direktoriju programa koja se ucitava u index.html 
+=======
+   for i in range (0,unos):
+       jsonDict = {
+           'Ime':townName,
+           'Velicina':_cityArea/1000000,
+           'Broj_stanovika':_population,
+           'Nadmorska_visina':_elevation }
+       jsonFile.append(jsonDict)
+       return 
+
+>>>>>>> parent of 7cdcb74... beta2
 def WriteJSONFile(jsonFile):
     with io.open('dataJSON.json','w',encoding='utf-8') as f:
         f.write(json.dumps(jsonFile, sort_keys = False, ensure_ascii=False))
@@ -92,8 +103,11 @@ def OpenHTML():
 
 
 ans = 1
+<<<<<<< HEAD
 brojac = 0
 kriviUnos=1
+=======
+>>>>>>> parent of 7cdcb74... beta2
 while ans:
     print("=====================")
     print("1. Usporedba gradova")
@@ -102,6 +116,7 @@ while ans:
     unos = int(input("Vas odabir: "))
     if unos == 1:
         jsonFile.clear()
+<<<<<<< HEAD
        # while True:
            # try:
         brGradova=int(input("Koliko gradova zelite usporediti: "))
@@ -123,6 +138,21 @@ while ans:
             #except:
                # print("Krivi unos!")
                 #break
+=======
+        while True:
+            try:
+                brGradova=int(input("Koliko gradova zelite usporediti: "))
+                for i in range(0,brGradova):
+                    townName = input("Unesite ime grada: ").title()
+                    cityArea,population,elevation=GetData(townName)
+                    MakeJSON(cityArea,population,elevation)
+                WriteJSONFile(jsonFile)
+                OpenHTML()
+                break
+            except:
+                print("Krivi unos!")
+                break
+>>>>>>> parent of 7cdcb74... beta2
     elif unos==9:
         ans=0
         
