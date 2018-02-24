@@ -11,18 +11,22 @@ from urllib.request import pathname2url
 
 jsonFile = []
 
+#dohvacanje podataka iz baze znanja DBpedia i vracanje informacija o gradu/drzavi/zupaniji koje se spremaju u jsonDict rijecnik
 def GetData(_townName):
     provjera = 1
     provjera2 = 0
-    kriviUnos=0
+    
     data = requests.get('http://dbpedia.org/data/'+_townName+'.json').json()
     if not data:
         print ("Grad ne postoji u bazi!!!!")
-        
-        
+        kriviUnos=1
+        cityArea=0
+        population=0
+        elevation=0
+        return cityArea,population,elevation        
     else:
             town = data['http://dbpedia.org/resource/'+_townName]
-            
+            kriviUnos=0
             while True:
                 try:
                     cityArea = town['http://dbpedia.org/ontology/areaTotal'][0]['value']
@@ -49,10 +53,10 @@ def GetData(_townName):
                         break   
             while True:
                 try:
-                    population = town['http://dbpedia.org/ontology/populationUrban'][0]['value']
+                    population = town['http://dbpedia.org/ontology/populationTotal'][0]['value']
                     break
                 except:
-                    population = town['http://dbpedia.org/ontology/populationTotal'][0]['value']
+                    population = town['http://dbpedia.org/ontology/populationUrban'][0]['value']
                     break
             while True:
                 try:
@@ -65,7 +69,7 @@ def GetData(_townName):
             return cityArea,population,elevation
             
     
-
+#Kreiranje .json datoteke na temelju jsonDict rijecnika
 def MakeJSON(_cityArea,_population,_elevation):
    jsonDict = {
        'Ime':townName,
@@ -74,13 +78,13 @@ def MakeJSON(_cityArea,_population,_elevation):
        'Nadmorska_visina':_elevation }
    jsonFile.append(jsonDict)
    return 
-
+#kreiranje .json da datoteke u direktoriju programa koja se ucitava u index.html 
 def WriteJSONFile(jsonFile):
     with io.open('dataJSON.json','w',encoding='utf-8') as f:
         f.write(json.dumps(jsonFile, sort_keys = False, ensure_ascii=False))
         f.close()
     return
-    
+#otvaranje index.html datoteke u defoltnom web pregledniku.   
 def OpenHTML():
     url = 'file:{}'.format(pathname2url(os.path.abspath('index.html')))
     webbrowser.open(url,new=0)
@@ -89,6 +93,7 @@ def OpenHTML():
 
 ans = 1
 brojac = 0
+kriviUnos=1
 while ans:
     print("=====================")
     print("1. Usporedba gradova")
@@ -97,20 +102,27 @@ while ans:
     unos = int(input("Vas odabir: "))
     if unos == 1:
         jsonFile.clear()
-        while True:
-            try:
-                brGradova=int(input("Koliko gradova zelite usporediti: "))
-                while brojac!=brGradova:
-                    townName = input("Unesite ime grada: ").title()
-                    cityArea,population,elevation=GetData(townName)
-                    MakeJSON(cityArea,population,elevation)
-                    brojac=brojac+1
-                WriteJSONFile(jsonFile)
-                OpenHTML()
-                break
-            except:
-                print("Krivi unos!")
-                break
+       # while True:
+           # try:
+        brGradova=int(input("Koliko gradova zelite usporediti: "))
+        while brojac!=brGradova:
+            
+            
+            townName = input("Unesite ime grada: ").title()
+            cityArea,population,elevation=GetData(townName)
+            if kriviUnos==1:
+                print("Krivi unos podataka")
+            else:
+                kriviUnos=0
+                MakeJSON(cityArea,population,elevation)
+                brojac=brojac+1
+           
+        WriteJSONFile(jsonFile)
+        OpenHTML()
+                #break
+            #except:
+               # print("Krivi unos!")
+                #break
     elif unos==9:
         ans=0
         
