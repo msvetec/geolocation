@@ -107,17 +107,18 @@ d3.json("dataJSON.json", function(error,data) {
         .style("text-anchor", "end")
         .attr("font-size", "10px");
 
-
-    // Draw yAxis and postion the label
-    chart1.append("g")
+	 chart1.append("g")
         .attr("class", "y axis")
         .call(yAxis)
         .append("text")
         .attr("transform", "rotate(-90)")
-        .attr("x", -height/2)
-        .attr("dy", "-3em")
+		.attr("y",0 - margin.left)
+        .attr("x",0 -(height/2))
+        .attr("dy", "0.71em")
         .style("text-anchor", "middle")
         .text("Nadmorska visina (m)");
+
+   
 });
 //Prikaz povrsine
 d3.json("dataJSON.json", function(error,data) {
@@ -190,16 +191,17 @@ d3.json("dataJSON.json", function(error,data) {
         .attr("font-size", "10px");
 
 
-   
-    chart2.append("g")
+   chart2.append("g")
         .attr("class", "y axis")
         .call(yAxis)
         .append("text")
         .attr("transform", "rotate(-90)")
-        .attr("x", -height/2)
-        .attr("dy", "-3em")
+		.attr("y",0 - margin.left)
+        .attr("x",0 -(height/2))
+        .attr("dy", "0.71em")
         .style("text-anchor", "middle")
         .text("Površina grada (km^2)");
+  
 });
 
 

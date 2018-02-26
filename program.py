@@ -4,12 +4,11 @@ import json
 import io
 import webbrowser
 import os
-import time
 from urllib.request import pathname2url
 
 
 
-
+jsonCreated = 0
 jsonFile = []
 #dohvacanje podataka iz baze znanja DBpedia i vracanje informacija o gradu/drzavi/zupaniji koje se spremaju u jsonDict rijecnik
 def GetData(_brPonavljanja):
@@ -29,6 +28,8 @@ def GetData(_brPonavljanja):
             town = data['http://dbpedia.org/resource/'+townName]
             kriviUnos=0
             #dohvacanje podataka o povrsini
+            #zbog nepotpunosti baze podataka prvo se pronaleze podaci o samom gradu a ako nisu navedene onda se uzme u obzir i urbani dio
+            #nedostata baze znanja je i taj sto nisu isti pojmovi jednako definirani kao npr kod Parisa povrsina se nalazi pod upitom /area a ne kao kod ostalih gdje je taj podatak u /areaTotal
             while True:
                 try:
                     cityArea = town['http://dbpedia.org/ontology/areaTotal'][0]['value']
@@ -94,32 +95,38 @@ def GetData(_brPonavljanja):
              
 #Kreiranje .json datoteke na temelju jsonDict rijecnika
 def MakeJSON(_cityArea,_population,_elevation,_townName):
-   for i in range (0,unos):
-       jsonDict = {
-           'Ime':_townName,
-           'Velicina':_cityArea/1000000,
-           'Broj_stanovika':_population,
-           'Nadmorska_visina':_elevation }
-       jsonFile.append(jsonDict)
-       return 
+    jsonCreated = 1
+    for i in range (0,unos):
+        jsonDict = {
+            'Ime':_townName,
+            'Velicina':_cityArea/1000000,
+            'Broj_stanovika':_population,
+            'Nadmorska_visina':_elevation }
+        jsonFile.append(jsonDict)
+    return 
 #kreiranje .json da datoteke u direktoriju programa koja se ucitava u graphDraw.js
 def WriteJSONFile(jsonFile):
     with io.open('dataJSON.json','w',encoding='utf-8') as f:
         f.write(json.dumps(jsonFile, sort_keys = False, ensure_ascii=False))
         f.close()
     return
-#otvaranje index.html datoteke u defoltnom web pregledniku.       
+#provjera postojanja .json datoteke i otvaranje index.html datoteke u defoltnom web pregledniku.       
 def OpenHTML():
-    url = 'file:{}'.format(pathname2url(os.path.abspath('index.html')))
-    webbrowser.open(url,new=0)
-    return
+    fname="dataJSON.json"
+    if os.path.isfile(fname):
+        url = 'file:{}'.format(pathname2url(os.path.abspath('index.html')))
+        webbrowser.open(url,new=0)
+    else:
+        print("Podaci ne postoje odaberite opciju 1.")
+   
 
-
+        
 ans = 1
 unosBroja = 0
 while ans:
     print("=====================")
     print("1. Usporedba gradova")
+    print("2. Otvori postojece analize")
     print("9. Kraj!")
     print("=====================")
     unos = int(input("Vas odabir: "))
@@ -137,7 +144,9 @@ while ans:
         if unosBroja:
             GetData(brGradova)
             WriteJSONFile(jsonFile)
-            OpenHTML()       
+            OpenHTML()
+    elif unos==2:
+        OpenHTML()
     elif unos==9:
         ans=0
         
